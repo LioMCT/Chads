@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Heidelberger Chads</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --gold: #D4AF37; --gold-light: #F5D776; --gold-dark: #B8860B;
+      --bg: #0a0a0a; --bg2: #111; --bg3: #1a1a1a;
+      --border: #2a2a2a; --text: #fff; --muted: #888; --dim: #555;
+      --red: #e74c3c; --green: #2ecc71;
+    }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: 'Barlow Condensed', sans-serif; overflow-x: hidden; min-height: 100vh; }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #111; }
+    ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+    /* ── NAV ── */
+    nav { position: sticky; top: 0; z-index: 200; background: rgba(10,10,10,0.96); backdrop-filter: blur(12px); border-bottom: 1px solid #1a1a1a; padding: 0 20px; }
+    .nav-inner { max-width: 1400px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; height: 64px; gap: 12px; }
+    .nav-logo { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; }
+    .nav-logo-icon { width: 44px; height: 44px; background: var(--bg2); border: 2px solid var(--gold); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Anton', sans-serif; font-size: 22px; color: var(--gold); }
+    .nav-logo-text { line-height: 1; }
+    .nav-logo-text span:first-child { display: block; font-family: 'Anton', sans-serif; font-size: 15px; letter-spacing: 3px; color: var(--gold); }
+    .nav-logo-text span:last-child { display: block; font-family: 'Anton', sans-serif; font-size: 9px; letter-spacing: 4px; color: var(--dim); }
+    .nav-links { display: flex; gap: 2px; flex-wrap: wrap; }
+    .nav-link { color: var(--muted); font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; padding: 8px 10px; border-bottom: 2px solid transparent; transition: all .2s; background: none; border-top: none; border-left: none; border-right: none; }
+    .nav-link:hover, .nav-link.active { color: var(--gold); border-bottom-color: var(--gold); }
+    .nav-actions { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+    .nav-user { display: flex; align-items: center; gap: 8px; }
+    .nav-user img { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--gold); object-fit: cover; }
+    .nav-user-name { font-family: 'Anton', sans-serif; font-size: 14px; color: var(--gold); }
+
+    /* ── BUTTONS ── */
+    .btn-gold { background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light)); color: #000; border: none; padding: 11px 24px; font-family: 'Barlow Condensed', sans-serif; font-weight: 900; font-size: 15px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); transition: all .2s; }
+    .btn-gold:hover { filter: brightness(1.1); transform: scale(1.04); }
+    .btn-dark { background: transparent; color: var(--gold); border: 1px solid var(--gold); padding: 9px 20px; font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: all .2s; }
+    .btn-dark:hover { background: rgba(212,175,55,.1); transform: translateY(-2px); }
+    .btn-red { border-color: var(--red); color: var(--red); }
+    .btn-sm { padding: 6px 14px; font-size: 12px; }
+
+    /* ── PAGES ── */
+    .page { display: none; animation: pageIn .35s cubic-bezier(.16,1,.3,1); }
+    .page.active { display: block; }
+    @keyframes pageIn { from { opacity:0; transform: translateY(18px) scale(.97); } to { opacity:1; transform: none; } }
+
+    /* ── HERO ── */
+    .hero { min-height: 92vh; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; overflow: hidden; background: radial-gradient(ellipse at 50% 0%, rgba(212,175,55,.08) 0%, transparent 70%); text-align: center; padding: 40px 20px; }
+    .hero-grid { position: absolute; inset: 0; background-image: repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(212,175,55,.03) 80px, rgba(212,175,55,.03) 81px), repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(212,175,55,.03) 80px, rgba(212,175,55,.03) 81px); pointer-events: none; }
+    .hero-crown { font-size: 100px; margin-bottom: 16px; filter: drop-shadow(0 0 40px rgba(212,175,55,.4)); animation: heroIn .6s both; }
+    .hero-sub { font-family: 'Anton', sans-serif; font-size: clamp(12px,2.5vw,18px); letter-spacing: 8px; color: var(--muted); margin-bottom: 8px; animation: heroIn .7s both; }
+    .hero-title-gold { font-family: 'Anton', sans-serif; font-size: clamp(56px,11vw,130px); letter-spacing: 6px; background: linear-gradient(135deg, var(--gold-dark), var(--gold), var(--gold-light), var(--gold), var(--gold-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; line-height: .9; animation: heroIn .8s both; }
+    .hero-title-white { font-family: 'Anton', sans-serif; font-size: clamp(56px,11vw,130px); letter-spacing: 6px; color: #fff; line-height: .9; animation: heroIn .85s both; }
+    .hero-tagline { font-size: 17px; color: var(--muted); letter-spacing: 3px; text-transform: uppercase; margin-top: 16px; animation: heroIn .9s both; }
+    .hero-btns { display: flex; gap: 16px; margin-top: 40px; flex-wrap: wrap; justify-content: center; animation: heroIn 1s both; }
+    .hero-stats { display: flex; gap: 48px; margin-top: 56px; flex-wrap: wrap; justify-content: center; animation: heroIn 1.05s both; }
+    .hero-stat-val { font-family: 'Anton', sans-serif; font-size: 44px; color: var(--gold); }
+    .hero-stat-label { font-size: 11px; color: var(--dim); letter-spacing: 3px; text-transform: uppercase; }
+    .hero-arrow { position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%); color: #444; font-size: 22px; animation: pulse 2s infinite; }
+    @keyframes heroIn { from { opacity:0; transform: translateY(28px); } to { opacity:1; transform: none; } }
+    @keyframes pulse { 0%,100%{transform:translateX(-50%) scale(1);} 50%{transform:translateX(-50%) scale(1.15);} }
+
+    /* ── SECTION ── */
+    .section { max-width: 1200px; margin: 0 auto; padding: 70px 20px; }
+    .section-center { text-align: center; margin-bottom: 48px; }
+    .section-title { font-family: 'Anton', sans-serif; font-size: clamp(30px,5vw,64px); letter-spacing: 4px; text-transform: uppercase; background: linear-gradient(135deg, var(--gold), #fff 50%, var(--gold)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .section-sub { color: var(--muted); font-size: 15px; letter-spacing: 2px; text-transform: uppercase; margin-top: 8px; }
+    .gold-line { height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin: 22px 0; }
+
+    /* ── CARDS ── */
+    .card { background: linear-gradient(145deg, #141414, var(--bg3)); border: 1px solid var(--border); transition: all .3s cubic-bezier(.16,1,.3,1); position: relative; overflow: hidden; }
+    .card::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background: linear-gradient(90deg, transparent, var(--gold), transparent); transform: scaleX(0); transition: transform .3s; }
+    .card:hover::before { transform: scaleX(1); }
+    .card:hover { border-color: var(--gold); transform: translateY(-5px) scale(1.015); box-shadow: 0 18px 56px rgba(212,175,55,.14); }
+
+    /* ── RANK BADGE ── */
+    .rank-badge { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; font-family: 'Anton', sans-serif; font-size: 13px; font-weight: 900; border-radius: 50%; flex-shrink: 0; }
+    .rank-1 { background: linear-gradient(135deg,#FFD700,#FFA500); }
+    .rank-2 { background: linear-gradient(135deg,#C0C0C0,#A8A8A8); }
+    .rank-3 { background: linear-gradient(135deg,#CD7F32,#A0522D); }
+    .rank-other { background: var(--bg3); border: 1px solid #333; color: var(--dim); }
+
+    /* ── TAG ── */
+    .tag { display: inline-block; padding: 3px 10px; font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin: 2px; border-radius: 2px; }
+
+    /* ── TOP 3 GRID ── */
+    .top3-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px,1fr)); gap: 22px; }
+    .top3-card { cursor: pointer; }
+    .top3-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
+    .top3-card-body { padding: 20px; }
+    .top3-name { font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 2px; }
+    .top3-desc { color: var(--muted); font-size: 13px; margin: 8px 0; }
+    .top3-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; }
+    .top3-pts { color: var(--gold); font-family: 'Anton', sans-serif; font-size: 20px; }
+    .top3-school { color: var(--dim); font-size: 12px; }
+
+    /* ── RANKINGS LIST ── */
+    .rankings-list { display: grid; gap: 10px; }
+    .rank-row { display: flex; align-items: center; gap: 14px; padding: 14px 18px; cursor: pointer; }
+    .rank-row img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; }
+    .rank-row-info { flex: 1; min-width: 0; }
+    .rank-row-name { font-family: 'Anton', sans-serif; font-size: 17px; letter-spacing: 1px; }
+    .rank-row-tags { display: flex; gap: 3px; flex-wrap: wrap; margin-top: 3px; }
+    .rank-row-right { text-align: right; }
+    .rank-pts { font-family: 'Anton', sans-serif; font-size: 22px; }
+    .rank-pts-label { color: var(--dim); font-size: 11px; letter-spacing: 2px; margin-bottom: 5px; }
+    .vote-btns { display: flex; gap: 5px; justify-content: flex-end; }
+    .vote-btn { padding: 4px 10px; cursor: pointer; font-weight: 700; font-size: 14px; font-family: 'Barlow Condensed', sans-serif; border: 1px solid; transition: all .2s; }
+    .vote-up { background: #1a2a1a; border-color: #2a4a2a; color: var(--green); }
+    .vote-down { background: #2a1a1a; border-color: #4a2a2a; color: var(--red); }
+
+    /* ── PROFILE DETAIL ── */
+    .profile-detail-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; align-items: start; }
+    .profile-detail-img { width: 100%; aspect-ratio: 1; object-fit: cover; border: 3px solid var(--gold); display: block; }
+    .profile-detail-name { font-family: 'Anton', sans-serif; font-size: clamp(30px,5vw,52px); letter-spacing: 3px; line-height: 1; }
+    .profile-detail-school { color: var(--gold); font-size: 17px; letter-spacing: 2px; margin-top: 8px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .stat-box { background: var(--bg2); border: 1px solid #1a1a1a; padding: 16px; text-align: center; }
+    .stat-val { font-family: 'Anton', sans-serif; font-size: 28px; }
+    .stat-label { color: var(--dim); font-size: 11px; letter-spacing: 2px; }
+
+    /* ── BATTLE ── */
+    .battle-vs-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 20px; align-items: center; }
+    .vs-text { font-family: 'Anton', sans-serif; font-size: 64px; color: var(--gold); text-shadow: 0 0 40px rgba(212,175,55,.5); animation: pulse2 1.5s ease-in-out infinite; text-align: center; }
+    @keyframes pulse2 { 0%,100%{transform:scale(1);} 50%{transform:scale(1.08);} }
+    .battle-card { background: var(--bg2); border: 2px solid var(--border); overflow: hidden; cursor: pointer; transition: all .3s; }
+    .battle-card:hover { border-color: var(--gold); transform: scale(1.02); box-shadow: 0 0 40px rgba(212,175,55,.25); }
+    .battle-card img { width: 100%; aspect-ratio: 3/4; object-fit: cover; display: block; }
+    .battle-card-body { padding: 18px; }
+    .battle-progress { background: #1a1a1a; height: 4px; border-radius: 2px; overflow: hidden; margin: 10px 0; }
+    .battle-progress-bar { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); transition: width .5s; }
+    .battle-round-label { color: var(--gold); font-size: 15px; letter-spacing: 3px; text-align: center; font-weight: 700; }
+
+    /* ── SCHOOLS ── */
+    .school-card { background: var(--bg2); padding: 26px; margin-bottom: 22px; }
+    .school-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 14px; }
+    .school-name-row { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+    .school-name { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 2px; }
+    .school-desc { color: var(--muted); font-size: 15px; }
+    .school-pts { font-family: 'Anton', sans-serif; font-size: 30px; color: var(--gold); text-align: right; }
+    .school-pts-label { color: var(--dim); font-size: 11px; letter-spacing: 2px; text-align: right; }
+    .school-dvotes { color: var(--red); font-size: 15px; text-align: right; }
+    .school-members { display: flex; gap: 7px; flex-wrap: wrap; align-items: center; }
+    .school-member-img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid #333; }
+    .school-footer { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 14px; }
+
+    /* ── COMMUNITY ── */
+    .post-card { background: var(--bg2); border: 1px solid #1a1a1a; padding: 22px; margin-bottom: 14px; }
+    .post-author { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .post-author img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+    .post-author-name { font-family: 'Anton', sans-serif; font-size: 15px; }
+    .post-author-date { color: var(--dim); font-size: 12px; }
+    .post-content { color: #ddd; font-size: 17px; line-height: 1.5; margin-bottom: 14px; }
+    .comment { display: flex; gap: 7px; margin-bottom: 7px; padding-left: 12px; border-left: 2px solid #2a2a2a; }
+    .comment-user { color: var(--gold); font-weight: 700; font-size: 13px; }
+    .comment-text { color: #aaa; font-size: 13px; }
+    .compose-box { background: var(--bg2); border: 1px solid var(--gold); padding: 22px; margin-bottom: 28px; }
+    .compose-header { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .compose-header img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+
+    /* ── NEWS ── */
+    .news-card { background: var(--bg2); border: 1px solid #1a1a1a; padding: 30px; margin-bottom: 18px; }
+    .news-meta { color: var(--gold); font-size: 11px; letter-spacing: 2px; margin-bottom: 8px; }
+    .news-title { font-family: 'Anton', sans-serif; font-size: 30px; letter-spacing: 2px; margin-bottom: 14px; }
+    .news-body { color: #ccc; font-size: 17px; line-height: 1.7; }
+    .news-compose { background: var(--bg2); border: 1px solid var(--gold); padding: 22px; margin-bottom: 36px; }
+    .news-compose-title { font-family: 'Anton', sans-serif; font-size: 18px; color: var(--gold); margin-bottom: 14px; }
+
+    /* ── INPUTS ── */
+    input, textarea, select { background: var(--bg3); border: 1px solid #333; color: #fff; padding: 10px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; width: 100%; margin-bottom: 10px; outline: none; transition: border-color .2s; }
+    input:focus, textarea:focus, select:focus { border-color: var(--gold); }
+    textarea { resize: vertical; min-height: 76px; }
+    select option { background: #222; }
+
+    /* ── MODAL ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.85); z-index: 1000; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; animation: fadeIn .2s; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    .modal-box { background: #111; border: 1px solid var(--gold); padding: 30px; width: min(480px,95vw); max-height: 90vh; overflow-y: auto; animation: slideUp .3s cubic-bezier(.16,1,.3,1); }
+    @keyframes slideUp { from{transform:translateY(36px);opacity:0} to{transform:none;opacity:1} }
+    .modal-title { font-family: 'Anton', sans-serif; font-size: 26px; letter-spacing: 3px; color: var(--gold); margin-bottom: 22px; }
+    .modal-actions { display: flex; gap: 10px; margin-top: 8px; }
+
+    /* ── NOTIFICATION ── */
+    #notif { position: fixed; top: 76px; right: 18px; z-index: 2000; padding: 13px 22px; font-weight: 700; font-size: 15px; letter-spacing: 1px; border-left: 4px solid; display: none; animation: notifIn .3s cubic-bezier(.16,1,.3,1); }
+    @keyframes notifIn { from{transform:translateX(100px);opacity:0} to{transform:none;opacity:1} }
+
+    /* ── RULES / ABOUT / PRIVACY ── */
+    .text-card { background: var(--bg2); border: 1px solid #1a1a1a; padding: 30px; margin-bottom: 18px; }
+    .text-card-title { font-family: 'Anton', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--gold); margin-bottom: 14px; }
+    .text-card-body { color: #ccc; font-size: 16px; line-height: 1.7; }
+    .rules-card { border-left: 4px solid var(--gold); }
+    .rules-list { list-style: none; padding: 0; }
+    .rules-list li { color: #ccc; font-size: 16px; padding: 8px 0 8px 20px; border-bottom: 1px solid #1a1a1a; position: relative; }
+    .rules-list li::before { content: '›'; position: absolute; left: 0; color: var(--gold); }
+    .about-values { display: grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); gap: 14px; margin-top: 14px; }
+    .value-card { background: var(--bg2); border: 1px solid #1a1a1a; padding: 22px; text-align: center; }
+    .value-icon { font-size: 34px; margin-bottom: 10px; }
+    .value-title { font-family: 'Anton', sans-serif; font-size: 16px; letter-spacing: 2px; margin-bottom: 6px; }
+    .value-desc { color: var(--muted); font-size: 13px; }
+
+    /* ── CHAMPION ── */
+    .champion-wrap { max-width: 540px; margin: 0 auto; text-align: center; padding: 80px 20px; }
+    .champion-img { width: 200px; height: 200px; border-radius: 50%; object-fit: cover; border: 4px solid var(--gold); margin: 24px auto; display: block; box-shadow: 0 0 60px rgba(212,175,55,.4); }
+
+    /* ── BATTLE LEADERBOARD ── */
+    .battle-lb { display: grid; gap: 10px; margin-top: 32px; }
+    .battle-lb-row { display: flex; align-items: center; gap: 14px; background: var(--bg2); border: 1px solid #1a1a1a; padding: 13px 18px; }
+    .battle-lb-row img { width: 38px; height: 38px; border-radius: 50%; object-fit: cover; border: 2px solid var(--gold); }
+    .battle-lb-name { flex: 1; font-family: 'Anton', sans-serif; font-size: 17px; }
+    .battle-lb-wins { font-family: 'Anton', sans-serif; font-size: 22px; color: var(--gold); }
+
+    /* ── ADMIN ── */
+    .admin-row { display: flex; align-items: center; gap: 14px; background: var(--bg2); border: 1px solid #1a1a1a; padding: 13px 18px; margin-bottom: 8px; }
+    .admin-row img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
+    .admin-row-name { flex: 1; font-family: 'Anton', sans-serif; font-size: 17px; }
+    .admin-row-pts { color: var(--gold); font-weight: 700; }
+    .admin-votes-input { width: 86px; background: var(--bg); border: 1px solid #333; color: var(--gold); padding: 6px 10px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; }
+
+    /* ── FOOTER ── */
+    footer { background: #050505; border-top: 1px solid #1a1a1a; padding: 46px 20px 22px; }
+    .footer-inner { max-width: 1200px; margin: 0 auto; }
+    .footer-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap: 38px; margin-bottom: 36px; }
+    .footer-brand { font-family: 'Anton', sans-serif; font-size: 19px; letter-spacing: 3px; color: var(--gold); margin-bottom: 12px; }
+    .footer-brand-desc { color: var(--dim); font-size: 13px; line-height: 1.6; }
+    .footer-col-title { font-weight: 700; font-size: 13px; letter-spacing: 3px; color: var(--dim); margin-bottom: 14px; text-transform: uppercase; }
+    .footer-link { color: var(--muted); font-size: 14px; margin-bottom: 7px; cursor: pointer; transition: color .2s; display: block; background: none; border: none; font-family: 'Barlow Condensed', sans-serif; text-align: left; }
+    .footer-link:hover { color: var(--gold); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+    .footer-copy { color: #444; font-size: 12px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      .profile-detail-grid { grid-template-columns: 1fr; }
+      .battle-vs-grid { grid-template-columns: 1fr; }
+      .vs-text { font-size: 40px; }
+      .stat-grid { grid-template-columns: repeat(3,1fr); }
+    }
+
+    /* ── NEWS TEASER BG ── */
+    .news-teaser-wrap { background: #0d0d0d; border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a; padding: 58px 20px; }
+    .news-teaser-inner { max-width: 1200px; margin: 0 auto; }
+    .news-teaser-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+    .news-teaser-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(270px,1fr)); gap: 18px; }
+    .news-teaser-card { background: var(--bg2); border: 1px solid #1a1a1a; padding: 22px; }
+
+    /* ── FILTERS ── */
+    .filter-row { display: flex; gap: 10px; margin-bottom: 28px; flex-wrap: wrap; }
+
+    /* ── CTA ── */
+    .cta-wrap { text-align: center; padding: 76px 20px; background: radial-gradient(ellipse at center, rgba(212,175,55,.05) 0%, transparent 70%); }
+    .cta-title { font-family: 'Anton', sans-serif; font-size: clamp(26px,5vw,54px); letter-spacing: 4px; margin-bottom: 20px; }
+    .cta-sub { color: var(--muted); font-size: 17px; margin-bottom: 28px; }
+  </style>
+</head>
+<body>
+
+<!-- ═══ NAV ═══ -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" onclick="showPage('home')">
+      <div class="nav-logo-icon">C</div>
+      <div class="nav-logo-text">
+        <span>HEIDELBERGER</span>
+        <span>CHADS</span>
+      </div>
+    </a>
+    <div class="nav-links">
+      <button class="nav-link active" onclick="showPage('home')">HOME</button>
+      <button class="nav-link" onclick="showPage('rankings')">RANKINGS</button>
+      <button class="nav-link" onclick="showPage('battle')">BATTLE</button>
+      <button class="nav-link" onclick="showPage('schools')">SCHULEN</button>
+      <button class="nav-link" onclick="showPage('community')">COMMUNITY</button>
+      <button class="nav-link" onclick="showPage('news')">NEWS</button>
+      <button class="nav-link" onclick="showPage('rules')">REGELN</button>
+      <button class="nav-link" id="admin-nav-btn" style="display:none" onclick="showPage('admin')">ADMIN</button>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-user" id="nav-user-display" style="display:none">
+        <img id="nav-user-img" src="" alt="avatar" />
+        <span class="nav-user-name" id="nav-user-name"></span>
+      </div>
+      <button class="btn-gold" id="nav-register-btn" style="padding:8px 14px;font-size:12px" onclick="openModal('modal-register')">PROFIL ERSTELLEN</button>
+      <button class="btn-dark btn-sm" id="nav-admin-btn" onclick="openModal('modal-admin-login')">ADMIN</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══ NOTIFICATION ═══ -->
+<div id="notif"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGES
+═══════════════════════════════════════════════════════ -->
+
+<!-- HOME -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-grid"></div>
+    <div class="hero-crown">👑</div>
+    <div class="hero-sub">HEIDELBERG'S OFFIZIELLES</div>
+    <div class="hero-title-gold">CHAD</div>
+    <div class="hero-title-white">RANKING</div>
+    <div class="hero-tagline">Wer ist der ultimative Chad Heidelbergs?</div>
+    <div class="hero-btns">
+      <button class="btn-gold" onclick="showPage('rankings')">RANKINGS ANSEHEN</button>
+      <button class="btn-dark" onclick="showPage('battle')">BATTLE STARTEN</button>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hero-stat-val" id="stat-profiles">12</div><div class="hero-stat-label">PROFILES</div></div>
+      <div><div class="hero-stat-val" id="stat-votes">0</div><div class="hero-stat-label">VOTES TODAY</div></div>
+      <div><div class="hero-stat-val" id="stat-battles">0</div><div class="hero-stat-label">BATTLES</div></div>
+    </div>
+    <div class="hero-arrow">↓</div>
+  </div>
+
+  <!-- TOP 3 -->
+  <div class="section">
+    <div class="section-center">
+      <div class="section-title">TOP CHADS</div>
+      <div class="section-sub">HEIDELBERGS ELITE</div>
+    </div>
+    <div class="top3-grid" id="top3-grid"></div>
+  </div>
+
+  <!-- NEWS TEASER -->
+  <div class="news-teaser-wrap">
+    <div class="news-teaser-inner">
+      <div class="news-teaser-header">
+        <div class="section-title" style="font-size:clamp(22px,4vw,46px)">NEWS</div>
+        <button class="btn-dark" onclick="showPage('news')">ALLE NEWS →</button>
+      </div>
+      <div class="news-teaser-grid" id="news-teaser-grid"></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-wrap">
+    <div class="cta-title">BIST DU EIN CHAD?</div>
+    <div class="cta-sub">Erstelle dein Profil und stell dich dem Urteil Heidelbergs</div>
+    <button class="btn-gold" style="font-size:17px;padding:15px 44px" onclick="openModal('modal-register')">JETZT MITMACHEN</button>
+  </div>
+</div>
+
+<!-- RANKINGS -->
+<div class="page" id="page-rankings">
+  <div class="section">
+    <div class="section-center">
+      <div class="section-title">CHAD RANKINGS</div>
+      <div class="section-sub">TOP 100 HEIDELBERGER CHADS</div>
+    </div>
+    <div class="filter-row">
+      <button class="btn-gold" id="filter-top" onclick="setRankView('top')">🏆 TOP RANKING</button>
+      <button class="btn-dark" id="filter-shame" onclick="setRankView('shame')">💀 HALL OF SHAME</button>
+    </div>
+    <div class="rankings-list" id="rankings-list"></div>
+  </div>
+</div>
+
+<!-- PROFILE DETAIL -->
+<div class="page" id="page-profile">
+  <div class="section">
+    <button class="btn-dark" style="margin-bottom:28px" onclick="showPage('rankings')">← ZURÜCK</button>
+    <div class="profile-detail-grid" id="profile-detail-content"></div>
+  </div>
+</div>
+
+<!-- BATTLE -->
+<div class="page" id="page-battle">
+  <div id="battle-start-screen">
+    <div class="section" style="text-align:center">
+      <div class="section-title">BATTLE ARENA</div>
+      <div class="section-sub" style="margin-bottom:44px">32 CHADS TRETEN GEGENEINANDER AN</div>
+      <button class="btn-gold" style="font-size:20px;padding:18px 56px" onclick="startBattle()">⚔ BATTLE STARTEN</button>
+      <div>
+        <div class="section-title" style="font-size:clamp(22px,4vw,46px);margin:72px 0 28px">BATTLE LEADERBOARD</div>
+        <div class="battle-lb" id="battle-lb"></div>
+      </div>
+    </div>
+  </div>
+  <div id="battle-arena" style="display:none">
+    <div class="section" style="padding-top:36px">
+      <div style="text-align:center;margin-bottom:14px">
+        <div class="battle-round-label" id="battle-round-label"></div>
+        <div class="battle-progress" style="margin:10px 0"><div class="battle-progress-bar" id="battle-progress-bar" style="width:0%"></div></div>
+      </div>
+      <div class="battle-vs-grid">
+        <div class="battle-card" id="battle-card-a" onclick="battleVote('a')"></div>
+        <div class="vs-text">VS</div>
+        <div class="battle-card" id="battle-card-b" onclick="battleVote('b')"></div>
+      </div>
+    </div>
+  </div>
+  <div id="battle-champion" style="display:none">
+    <div class="champion-wrap">
+      <div style="font-size:80px">🏆</div>
+      <div class="section-title" style="margin:12px 0">CHAMPION!</div>
+      <img id="champion-img" src="" alt="champion" class="champion-img" />
+      <div id="champion-name" style="font-family:'Anton',sans-serif;font-size:38px;color:var(--gold);margin-bottom:28px"></div>
+      <button class="btn-gold" style="font-size:17px;padding:14px 44px" onclick="startBattle()">NEUES BATTLE</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCHOOLS -->
+<div class="page" id="page-schools">
+  <div class="section">
+    <div class="section-center">
+      <div class="section-title">SCHULEN RANKING</div>
+      <div class="section-sub">WELCHE SCHULE HAT DIE BESTEN CHADS?</div>
+    </div>
+    <div id="schools-list"></div>
+  </div>
+</div>
+
+<!-- COMMUNITY -->
+<div class="page" id="page-community">
+  <div class="section" style="max-width:800px">
+    <div class="section-center">
+      <div class="section-title">COMMUNITY</div>
+      <div class="section-sub">HEIDELBERGER CHADS REDEN</div>
+    </div>
+    <div id="community-compose"></div>
+    <div id="community-posts"></div>
+  </div>
+</div>
+
+<!-- NEWS -->
+<div class="page" id="page-news">
+  <div class="section" style="max-width:900px">
+    <div class="section-center"><div class="section-title">NEWS</div></div>
+    <div id="news-compose"></div>
+    <div id="news-list"></div>
+  </div>
+</div>
+
+<!-- RULES -->
+<div class="page" id="page-rules">
+  <div class="section" style="max-width:900px">
+    <div class="section-center">
+      <div class="section-title">REGELN</div>
+      <div class="section-sub">FAIR PLAY FÜR ALLE</div>
+    </div>
+    <div class="text-card rules-card"><div class="text-card-title">⚖ FAIR & TRANSPARENTE METHODIK</div><div class="text-card-body">Unser Ranking-System basiert auf Community-Votes kombiniert mit einem algorithmischen Scoring-Ansatz. Alle Votes werden nach IP und Account getrackt um Manipulation zu verhindern. Jeder User kann alle 12 Stunden einmal voten. Battle-Ergebnisse fließen separat in das Battle-Leaderboard ein.</div></div>
+    <div class="text-card rules-card"><div class="text-card-title">📈 MOVEMENT INDICATORS</div><div class="text-card-body">Pfeile nach oben oder unten zeigen die Ranking-Bewegung der letzten 7 Tage. Ein stabiles Ranking bedeutet gleichbleibende Community-Wahrnehmung. Schnelle Aufstiege werden markiert. Battle-Wins beeinflussen das Battle-Leaderboard direkt.</div></div>
+    <div class="text-card rules-card"><div class="text-card-title">🎯 SCORING FAKTOREN</div><div class="text-card-body">Upvotes +1 Punkt · Downvotes -0.5 Punkte · Battle Wins +2 Punkte · Schulen-Ranking wird separat berechnet · Community-Engagement wird belohnt · Profilqualität (Foto, Beschreibung, Tags) wird berücksichtigt.</div></div>
+    <div class="text-card rules-card"><div class="text-card-title">🤝 COMMUNITY GUIDELINES</div><ul class="rules-list"><li>Sei respektvoll und konstruktiv in deinen Kommentaren</li><li>Vote basierend auf tatsächlichem Einfluss und Präsenz</li><li>Begründe deinen Vote wenn möglich um anderen zu helfen</li><li>Melde missbräuchliche oder Spam-Inhalte sofort beim Admin</li><li>Keine Beleidigungen, Rassismus oder Hassrede – sofortiger Bann</li><li>Fake-Profile und Vote-Manipulation werden sofort gelöscht</li></ul></div>
+    <div style="background:#0d1a0d;border:1px solid #1a3a1a;padding:22px;margin-top:28px"><div style="font-family:'Anton',sans-serif;font-size:17px;color:var(--green);margin-bottom:7px">COMMUNITY VOTING HINWEIS</div><div style="color:#aaa;font-size:15px;line-height:1.6">Community-Votes dienen als Sentiment-Indikatoren. Finale Rankings werden durch unsere algorithmische Methodik bestimmt um Fairness zu gewährleisten.</div></div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div class="page" id="page-about">
+  <div class="section" style="max-width:900px">
+    <div class="section-center"><div style="font-size:76px;margin-bottom:20px">👑</div><div class="section-title">ÜBER UNS</div></div>
+    <div class="text-card"><div class="text-card-title">WAS IST HEIDELBERGER CHADS?</div><div class="text-card-body">Heidelberger Chads ist die inoffizielle, offizielle Ranking-Plattform für die Community Heidelbergs. Wir bieten ein transparentes, von der Community getriebenes Ranking-System für alle Heidelberger.</div></div>
+    <div class="text-card"><div class="text-card-title">UNSERE MISSION</div><div class="text-card-body">Heidelberg hat eine einzigartige Jugendkultur. Wir wollen diese feiern, dokumentieren und der Community eine Stimme geben. Battles, Rankings, Schulen-Vergleiche – alles fair, transparent und spaßig.</div></div>
+    <div class="about-values">
+      <div class="value-card"><div class="value-icon">🏙</div><div class="value-title">COMMUNITY FIRST</div><div class="value-desc">Für Heidelberg, von Heidelberg</div></div>
+      <div class="value-card"><div class="value-icon">⚖</div><div class="value-title">FAIR & TRANSPARENT</div><div class="value-desc">Kein Pay-to-Win, kein Bias</div></div>
+      <div class="value-card"><div class="value-icon">🔒</div><div class="value-title">DATENSCHUTZ</div><div class="value-desc">Deine Daten gehören dir</div></div>
+      <div class="value-card"><div class="value-icon">🎯</div><div class="value-title">QUALITÄT</div><div class="value-desc">Nur echte Heidelberger</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- PRIVACY -->
+<div class="page" id="page-privacy">
+  <div class="section" style="max-width:900px">
+    <div class="section-center"><div class="section-title">DATENSCHUTZ & COOKIES</div></div>
+    <div class="text-card"><div class="text-card-title">🔒 DATENSCHUTZERKLÄRUNG</div><div class="text-card-body">Diese Website speichert minimale Nutzerdaten. Profile werden mit von dir eingegebenen Informationen erstellt. Wir speichern keine Passwörter oder sensiblen Daten. Alle Daten bleiben in deinem Browser und werden nicht an externe Server übertragen.</div></div>
+    <div class="text-card"><div class="text-card-title">🍪 COOKIE-RICHTLINIE</div><div class="text-card-body">Wir verwenden ausschließlich technisch notwendige Cookies. Keine Tracking-Cookies, keine Werbe-Cookies. Ein Session-Cookie speichert deinen Login-Status.</div></div>
+    <div class="text-card"><div class="text-card-title">📋 NUTZERDATEN</div><div class="text-card-body">Du hast das Recht deine Daten einzusehen, zu ändern oder zu löschen. Kontaktiere den Admin über die Community-Sektion. Dein Profil kann jederzeit vom Admin auf Anfrage entfernt werden.</div></div>
+    <div class="text-card"><div class="text-card-title">⚖ RECHTLICHE HINWEISE</div><div class="text-card-body">Diese Plattform ist ein privates Community-Projekt ohne kommerziellen Zweck. Alle Rankings basieren auf Community-Votes und stellen keine offiziellen Bewertungen dar.</div></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="page" id="page-admin">
+  <div class="section">
+    <div class="section-title" style="margin-bottom:40px">ADMIN PANEL</div>
+    <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);margin-bottom:16px;letter-spacing:2px">PROFILE VERWALTEN</div>
+    <div id="admin-profiles-list"></div>
+    <div class="gold-line"></div>
+    <div style="font-family:'Anton',sans-serif;font-size:20px;color:var(--gold);margin:28px 0 16px;letter-spacing:2px">SCHULEN VERWALTEN</div>
+    <div id="admin-schools-list"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     MODALS
+═══════════════════════════════════════════════════════ -->
+
+<div class="modal-overlay" id="modal-register" onclick="closeModalOut(event,'modal-register')">
+  <div class="modal-box">
+    <div class="modal-title">PROFIL ERSTELLEN</div>
+    <input id="reg-name" placeholder="Dein Name *" />
+    <textarea id="reg-desc" rows="3" placeholder="Beschreibung über dich *"></textarea>
+    <input id="reg-tags" placeholder="Tags (komma-getrennt): genetics, hunter eyes, skater" />
+    <input id="reg-img" placeholder="Bild URL (z.B. https://...)" />
+    <select id="reg-school">
+      <option value="">Schule auswählen (optional)</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-gold" style="flex:1" onclick="submitRegister()">ERSTELLEN 🚀</button>
+      <button class="btn-dark" onclick="closeModal('modal-register')">ABBRECHEN</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-admin-login" onclick="closeModalOut(event,'modal-admin-login')">
+  <div class="modal-box" style="max-width:360px">
+    <div class="modal-title">ADMIN LOGIN</div>
+    <input id="admin-u" placeholder="Username" />
+    <input type="password" id="admin-pw" placeholder="Passwort" />
+    <div class="modal-actions">
+      <button class="btn-gold" style="flex:1" onclick="submitAdminLogin()">LOGIN</button>
+      <button class="btn-dark" onclick="closeModal('modal-admin-login')">ABBRECHEN</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">HEIDELBERGER CHADS</div>
+        <div class="footer-brand-desc">Die offizielle inoffizielle Chad-Plattform Heidelbergs.</div>
+      </div>
+      <div>
+        <div class="footer-col-title">NAVIGATION</div>
+        <button class="footer-link" onclick="showPage('home')">Home</button>
+        <button class="footer-link" onclick="showPage('rankings')">Rankings</button>
+        <button class="footer-link" onclick="showPage('battle')">Battle</button>
+        <button class="footer-link" onclick="showPage('schools')">Schulen</button>
+      </div>
+      <div>
+        <div class="footer-col-title">COMMUNITY</div>
+        <button class="footer-link" onclick="showPage('community')">Community</button>
+        <button class="footer-link" onclick="showPage('news')">News</button>
+        <button class="footer-link" onclick="showPage('rules')">Regeln</button>
+        <button class="footer-link" onclick="showPage('about')">Über uns</button>
+      </div>
+      <div>
+        <div class="footer-col-title">LEGAL</div>
+        <button class="footer-link" onclick="showPage('privacy')">Datenschutz</button>
+        <button class="footer-link" onclick="showPage('privacy')">Cookies</button>
+        <button class="footer-link" onclick="showPage('about')">Impressum</button>
+      </div>
+    </div>
+    <div class="gold-line"></div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2024 Heidelberger Chads · Alle Rechte vorbehalten</div>
+      <div class="footer-copy">Made in Heidelberg 🏰</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══════════════════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════════════════ -->
+<script>
+// ── DATA ──
+const ADMIN_CREDS = { u: "admin", pw: "chad2024!" };
+
+let profiles = [
+  { id:1, name:"Maximilian K.", img:"https://i.pravatar.cc/300?img=11", desc:"Gymnasiast aus Bergheim, Skater seit 2018. Hunter Eyes certified.", tags:["hunter eyes","skater","genetics","sigma"], votes:847, downvotes:23, school:"Hölderlin Gymnasium", battleWins:14 },
+  { id:2, name:"Leon S.", img:"https://i.pravatar.cc/300?img=57", desc:"Basketball-Profi aus Rohrbach. 6'2\", jawline schärfer als ein Messer.", tags:["basketball","tall","jawline","chad"], votes:792, downvotes:41, school:"Bunsen Gymnasium", battleWins:11 },
+  { id:3, name:"Benedikt R.", img:"https://i.pravatar.cc/300?img=15", desc:"Zitatemeister. Philosopher King von Heidelberg.", tags:["philosopher","sigma","quotes","alpha"], votes:734, downvotes:18, school:"Kurfürst-Friedrich Gymnasium", battleWins:9 },
+  { id:4, name:"Noah W.", img:"https://i.pravatar.cc/300?img=52", desc:"Surfer-Look obwohl kein Meer. Photoshopper und Content Creator.", tags:["aesthetics","creator","surfer vibes"], votes:621, downvotes:55, school:"Hölderlin Gymnasium", battleWins:7 },
+  { id:5, name:"Felix M.", img:"https://i.pravatar.cc/300?img=33", desc:"Finanzstudent IWH. Trägt immer Anzug. Big brain energy.", tags:["big brain","finance","suit","chad"], votes:589, downvotes:31, school:"IWH", battleWins:6 },
+  { id:6, name:"Elias T.", img:"https://i.pravatar.cc/300?img=60", desc:"Parkour-Läufer Heidelberg Altstadt. Free movement.", tags:["parkour","athletic","altstadt"], votes:554, downvotes:29, school:"Bunsen Gymnasium", battleWins:8 },
+  { id:7, name:"Lukas B.", img:"https://i.pravatar.cc/300?img=43", desc:"DJ und Producer. Spielt im Destille auf.", tags:["DJ","music","producer","nightlife"], votes:501, downvotes:67, school:"Kurfürst-Friedrich Gymnasium", battleWins:4 },
+  { id:8, name:"Jonas H.", img:"https://i.pravatar.cc/300?img=22", desc:"Klettert am Heiligenberg. Outdoortyp.", tags:["climbing","outdoor","nature","fit"], votes:488, downvotes:44, school:"Hölderlin Gymnasium", battleWins:5 },
+  { id:9, name:"Tobias R.", img:"https://i.pravatar.cc/300?img=55", desc:"Model-Lookout aus Neuenheim. Tallent gebucht.", tags:["model","tall","neuenheim","genetics"], votes:455, downvotes:38, school:"IWH", battleWins:3 },
+  { id:10, name:"Simon G.", img:"https://i.pravatar.cc/300?img=19", desc:"Kampfsportler MMA. Trainiert bei HC Heidelberg.", tags:["MMA","fighter","discipline","alpha"], votes:423, downvotes:52, school:"Bunsen Gymnasium", battleWins:6 },
+  { id:11, name:"David L.", img:"https://i.pravatar.cc/300?img=48", desc:"Architekt-Student. Zeichnet die Altstadt besser als sie ist.", tags:["architecture","creative","artist"], votes:401, downvotes:19, school:"Kurfürst-Friedrich Gymnasium", battleWins:2 },
+  { id:12, name:"Tim F.", img:"https://i.pravatar.cc/300?img=30", desc:"Liest mehr Bücher als alle anderen zusammen.", tags:["books","intellectual","sigma","library"], votes:378, downvotes:27, school:"Hölderlin Gymnasium", battleWins:1 },
+];
+
+let schools = [
+  { id:1, name:"Hölderlin Gymnasium", desc:"Das Top-Gym Heidelbergs. Home of the Chads.", members:[1,4,8,12], votes:1200, downvotes:45 },
+  { id:2, name:"Bunsen Gymnasium", desc:"Wissenschaftler und Sportler. Strong community.", members:[2,6,10], votes:980, downvotes:62 },
+  { id:3, name:"Kurfürst-Friedrich Gymnasium", desc:"Ältestes Gymnasium Heidelbergs. Legacy.", members:[3,7,11], votes:890, downvotes:38 },
+  { id:4, name:"IWH", desc:"Wirtschaft und Finance Chads.", members:[5,9], votes:720, downvotes:91 },
+];
+
+let news = [
+  { id:1, title:"Willkommen bei Heidelberger Chads!", content:"Die offizielle Ranking-Plattform für Heidelbergs Community ist jetzt live. Erstellt eure Profile, votet und gewinnt Battles!", date:"2024-06-01", author:"Admin" },
+  { id:2, title:"Battle-System Update", content:"Das neue 32-Slot Tournament Battle System ist jetzt verfügbar. Tritt an und beweise wer der ultimative Chad ist.", date:"2024-06-03", author:"Admin" },
+];
+
+let communityPosts = [
+  { id:1, authorId:1, content:"Wer hat heute Lust auf Skaten am Bismarckplatz? 🛹", likes:24, comments:[{user:"Leon S.",text:"Bin dabei!"},{user:"Noah W.",text:"Klingt gut"}], date:"2024-06-04" },
+  { id:2, authorId:3, content:"Neues Zitat des Tages: 'Ein Chad braucht keine Bestätigung – er gibt sie.'", likes:67, comments:[{user:"Felix M.",text:"🔥🔥🔥"}], date:"2024-06-05" },
+];
+
+let currentUser = null;
+let isAdmin = false;
+let voteCooldowns = {};
+let rankView = 'top';
+let battleState = null;
+
+// ── TAG COLORS ──
+const TAG_COLORS = {
+  "hunter eyes":"#D4AF37","genetics":"#C0392B","skater":"#2980B9","sigma":"#8E44AD",
+  "chad":"#D4AF37","basketball":"#E67E22","tall":"#27AE60","jawline":"#C0392B",
+  "alpha":"#D4AF37","philosopher":"#8E44AD","quotes":"#2980B9","big brain":"#27AE60",
+  "finance":"#27AE60","suit":"#2C3E50","parkour":"#E74C3C","athletic":"#E67E22",
+  "DJ":"#9B59B6","music":"#9B59B6","producer":"#9B59B6","climbing":"#27AE60",
+  "model":"#D4AF37","MMA":"#E74C3C","fighter":"#E74C3C","architecture":"#2980B9",
+  "books":"#8E44AD","intellectual":"#8E44AD","aesthetics":"#E67E22","creator":"#E67E22",
+};
+const tagColor = t => TAG_COLORS[t.toLowerCase()] || "#555";
+const tagHtml = t => `<span class="tag" style="background:${tagColor(t)}22;color:${tagColor(t)};border:1px solid ${tagColor(t)}44">${t}</span>`;
+const rankBadge = i => {
+  const cls = i===0?'rank-1':i===1?'rank-2':i===2?'rank-3':'rank-other';
+  return `<div class="rank-badge ${cls}">#${i+1}</div>`;
+};
+
+// ── NAVIGATION ──
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('active');
+  const btn = document.querySelector(`.nav-link[onclick*="'${id}'"]`);
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0 });
+  renderPage(id);
+}
+
+function renderPage(id) {
+  if (id === 'home') renderHome();
+  else if (id === 'rankings') renderRankings();
+  else if (id === 'battle') renderBattleStart();
+  else if (id === 'schools') renderSchools();
+  else if (id === 'community') renderCommunity();
+  else if (id === 'news') renderNews();
+  else if (id === 'admin') renderAdmin();
+}
+
+// ── NOTIFICATIONS ──
+function notify(msg, type='success') {
+  const n = document.getElementById('notif');
+  n.textContent = msg;
+  n.style.display = 'block';
+  n.style.background = type === 'error' ? '#1a0505' : '#0a1a0a';
+  n.style.borderColor = type === 'error' ? '#e74c3c' : '#27ae60';
+  n.style.color = type === 'error' ? '#e74c3c' : '#2ecc71';
+  clearTimeout(n._t);
+  n._t = setTimeout(() => n.style.display = 'none', 3000);
+}
+
+// ── MODALS ──
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function closeModalOut(e, id) { if (e.target === e.currentTarget) closeModal(id); }
+
+// ── VOTE ──
+function canVote(id) {
+  const last = voteCooldowns[id];
+  return !last || Date.now() - last > 43200000;
+}
+function doVote(id, dir) {
+  if (!canVote(id)) { notify("Du kannst erst in 12h wieder voten!", 'error'); return; }
+  const p = profiles.find(x => x.id === id);
+  if (!p) return;
+  if (dir === 'up') p.votes++; else p.downvotes++;
+  voteCooldowns[id] = Date.now();
+  notify(dir === 'up' ? '✅ Upvote registriert!' : '👎 Downvote registriert!');
+  renderPage('rankings');
+  updateStats();
+}
+function voteSchool(id, dir) {
+  const s = schools.find(x => x.id === id);
+  if (!s) return;
+  if (dir === 'up') s.votes++; else s.downvotes++;
+  notify('Schul-Vote registriert!');
+  renderSchools();
+}
+
+// ── REGISTER ──
+function submitRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const desc = document.getElementById('reg-desc').value.trim();
+  const tags = document.getElementById('reg-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  const imgUrl = document.getElementById('reg-img').value.trim();
+  const school = document.getElementById('reg-school').value;
+  if (!name || !desc) { notify('Name und Beschreibung sind Pflichtfelder!', 'error'); return; }
+  const newP = { id: Date.now(), name, img: imgUrl || `https://i.pravatar.cc/300?img=${Math.floor(Math.random()*70)}`, desc, tags, votes: 0, downvotes: 0, school, battleWins: 0 };
+  profiles.push(newP);
+  currentUser = newP;
+  closeModal('modal-register');
+  updateNavUser();
+  notify('🎉 Profil erstellt! Willkommen in den Rankings!');
+  updateStats();
+}
+
+// ── ADMIN LOGIN ──
+function submitAdminLogin() {
+  const u = document.getElementById('admin-u').value;
+  const pw = document.getElementById('admin-pw').value;
+  if (u === ADMIN_CREDS.u && pw === ADMIN_CREDS.pw) {
+    isAdmin = true;
+    closeModal('modal-admin-login');
+    document.getElementById('admin-nav-btn').style.display = '';
+    document.getElementById('nav-admin-btn').style.display = 'none';
+    notify('Admin-Login erfolgreich!');
+  } else {
+    notify('Falsche Zugangsdaten!', 'error');
+  }
+}
+
+function joinSchool(id) {
+  if (!currentUser) { notify('Erstelle erst ein Profil!', 'error'); return; }
+  const s = schools.find(x => x.id === id);
+  if (s && !s.members.includes(currentUser.id)) { s.members.push(currentUser.id); notify('Schule gejoint!'); renderSchools(); }
+}
+
+// ── NAV USER ──
+function updateNavUser() {
+  if (currentUser) {
+    document.getElementById('nav-user-display').style.display = 'flex';
+    document.getElementById('nav-user-img').src = currentUser.img;
+    document.getElementById('nav-user-name').textContent = currentUser.name;
+    document.getElementById('nav-register-btn').style.display = 'none';
+  }
+}
+
+// ── STATS ──
+function updateStats() {
+  document.getElementById('stat-profiles').textContent = profiles.length;
+  document.getElementById('stat-votes').textContent = profiles.reduce((a,p)=>a+p.votes,0).toLocaleString();
+  document.getElementById('stat-battles').textContent = profiles.reduce((a,p)=>a+p.battleWins,0).toLocaleString();
+}
+
+// ── HOME ──
+function renderHome() {
+  updateStats();
+  const top3 = [...profiles].sort((a,b)=>b.votes-a.votes).slice(0,3);
+  document.getElementById('top3-grid').innerHTML = top3.map((p,i) => `
+    <div class="card top3-card" onclick="openProfile(${p.id})">
+      <div style="position:relative">
+        <img src="${p.img}" style="width:100%;height:200px;object-fit:cover;display:block" alt="${p.name}" />
+        <div style="position:absolute;top:12px;left:12px">${rankBadge(i)}</div>
+        ${i===0?'<div style="position:absolute;top:12px;right:12px;font-size:26px">👑</div>':''}
+      </div>
+      <div class="top3-card-body">
+        <div class="top3-name">${p.name}</div>
+        <div class="top3-desc">${p.desc.slice(0,80)}...</div>
+        <div class="top3-foot">
+          <span class="top3-pts">${p.votes.toLocaleString()} pts</span>
+          <span class="top3-school">${p.school}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('news-teaser-grid').innerHTML = news.slice(0,2).map(n => `
+    <div class="news-teaser-card">
+      <div class="news-meta">${n.date} · ${n.author.toUpperCase()}</div>
+      <div style="font-family:'Anton',sans-serif;font-size:19px;letter-spacing:2px;margin-bottom:7px">${n.title}</div>
+      <div style="color:var(--muted);font-size:14px;line-height:1.5">${n.content.slice(0,100)}...</div>
+    </div>
+  `).join('');
+}
+
+// ── RANKINGS ──
+function setRankView(v) {
+  rankView = v;
+  document.getElementById('filter-top').className = v==='top' ? 'btn-gold' : 'btn-dark';
+  document.getElementById('filter-shame').className = v==='shame' ? 'btn-gold' : 'btn-dark';
+  renderRankings();
+}
+
+function renderRankings() {
+  const sorted = rankView === 'top'
+    ? [...profiles].sort((a,b)=>b.votes-a.votes)
+    : [...profiles].sort((a,b)=>b.downvotes-a.downvotes);
+  document.getElementById('rankings-list').innerHTML = sorted.slice(0,100).map((p,i) => `
+    <div class="card rank-row" onclick="openProfile(${p.id})">
+      ${rankBadge(i)}
+      <img src="${p.img}" style="border:${i<3?'2px solid var(--gold)':'2px solid #222'}" alt="${p.name}" />
+      <div class="rank-row-info">
+        <div class="rank-row-name">${p.name}</div>
+        <div class="rank-row-tags">${p.tags.slice(0,3).map(tagHtml).join('')}</div>
+      </div>
+      <div class="rank-row-right">
+        <div class="rank-pts" style="color:${rankView==='top'?'var(--gold)':'var(--red)'}">${(rankView==='top'?p.votes:p.downvotes).toLocaleString()}</div>
+        <div class="rank-pts-label">${rankView==='top'?'PUNKTE':'DOWNVOTES'}</div>
+        <div class="vote-btns" onclick="event.stopPropagation()">
+          <button class="vote-btn vote-up" onclick="doVote(${p.id},'up')">▲</button>
+          <button class="vote-btn vote-down" onclick="doVote(${p.id},'down')">▼</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── PROFILE DETAIL ──
+function openProfile(id) {
+  const p = profiles.find(x=>x.id===id);
+  if (!p) return;
+  document.getElementById('profile-detail-content').innerHTML = `
+    <div>
+      <img src="${p.img}" class="profile-detail-img" alt="${p.name}" />
+      <div style="display:flex;gap:12px;margin-top:14px">
+        <button class="btn-gold" style="flex:1" onclick="doVote(${p.id},'up');renderProfile(${p.id})">▲ UPVOTE</button>
+        <button class="btn-dark btn-red" style="flex:1" onclick="doVote(${p.id},'down');renderProfile(${p.id})">▼ DOWN</button>
+      </div>
+    </div>
+    <div>
+      <div class="profile-detail-name">${p.name}</div>
+      ${p.school?`<div class="profile-detail-school">${p.school}</div>`:''}
+      <div class="gold-line"></div>
+      <div style="color:#ccc;font-size:17px;line-height:1.6;margin-bottom:22px">${p.desc}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:28px">${p.tags.map(t=>tagHtml(t)).join('')}</div>
+      <div class="stat-grid">
+        <div class="stat-box"><div class="stat-val" style="color:var(--gold)">${p.votes.toLocaleString()}</div><div class="stat-label">PUNKTE</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--red)">${p.downvotes}</div><div class="stat-label">DOWNVOTES</div></div>
+        <div class="stat-box"><div class="stat-val" style="color:var(--green)">${p.battleWins}</div><div class="stat-label">BATTLE WINS</div></div>
+      </div>
+    </div>
+  `;
+  showPage('profile');
+}
+
+// ── BATTLE ──
+function renderBattleStart() {
+  const lb = [...profiles].sort((a,b)=>b.battleWins-a.battleWins).slice(0,10);
+  document.getElementById('battle-lb').innerHTML = lb.map((p,i) => `
+    <div class="battle-lb-row">
+      ${rankBadge(i)}
+      <img src="${p.img}" alt="${p.name}" />
+      <div class="battle-lb-name">${p.name}</div>
+      <div class="battle-lb-wins">${p.battleWins} W</div>
+    </div>
+  `).join('');
+  document.getElementById('battle-start-screen').style.display = '';
+  document.getElementById('battle-arena').style.display = 'none';
+  document.getElementById('battle-champion').style.display = 'none';
+}
+
+function startBattle() {
+  const shuffled = [...profiles].sort(()=>Math.random()-.5).slice(0,32);
+  battleState = { round:1, bracket:shuffled, matchIndex:0, results:[] };
+  document.getElementById('battle-start-screen').style.display = 'none';
+  document.getElementById('battle-champion').style.display = 'none';
+  document.getElementById('battle-arena').style.display = '';
+  renderBattleMatch();
+}
+
+function renderBattleMatch() {
+  const { bracket, matchIndex } = battleState;
+  const a = bracket[matchIndex*2];
+  const b = bracket[matchIndex*2+1];
+  if (!a || !b) return;
+  const total = Math.floor(bracket.length/2);
+  const names = {32:'RUNDE 1 (32)',16:'ACHTELFINALE',8:'VIERTELFINALE',4:'HALBFINALE',2:'FINALE'};
+  document.getElementById('battle-round-label').textContent = `${names[bracket.length]||'RUNDE'} · MATCH ${matchIndex+1}/${total}`;
+  document.getElementById('battle-progress-bar').style.width = `${((matchIndex+1)/total)*100}%`;
+  ['a','b'].forEach((key, idx) => {
+    const p = idx===0?a:b;
+    document.getElementById(`battle-card-${key}`).innerHTML = `
+      <img src="${p.img}" style="width:100%;aspect-ratio:3/4;object-fit:cover;display:block" alt="${p.name}" />
+      <div class="battle-card-body">
+        <div style="font-family:'Anton',sans-serif;font-size:22px;letter-spacing:2px;margin-bottom:7px">${p.name}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:3px;margin-bottom:10px">${p.tags.slice(0,3).map(tagHtml).join('')}</div>
+        <div style="color:var(--gold);font-family:'Anton',sans-serif;font-size:17px">${p.votes.toLocaleString()} pts</div>
+        <button class="btn-gold" style="width:100%;margin-top:10px;padding:11px;font-size:15px">WÄHLEN ⚔</button>
+      </div>
+    `;
+  });
+}
+
+function battleVote(side) {
+  const { bracket, matchIndex } = battleState;
+  const a = bracket[matchIndex*2];
+  const b = bracket[matchIndex*2+1];
+  const winner = side==='a'?a:b;
+  battleState.results.push(winner);
+  battleState.matchIndex++;
+  const total = Math.floor(bracket.length/2);
+  if (battleState.matchIndex >= total) {
+    battleState.bracket = battleState.results;
+    battleState.results = [];
+    battleState.matchIndex = 0;
+    battleState.round++;
+    if (battleState.bracket.length === 1) {
+      const champ = battleState.bracket[0];
+      const p = profiles.find(x=>x.id===champ.id);
+      if (p) p.battleWins++;
+      document.getElementById('battle-arena').style.display = 'none';
+      document.getElementById('battle-champion').style.display = '';
+      document.getElementById('champion-img').src = champ.img;
+      document.getElementById('champion-name').textContent = champ.name;
+      notify(`🏆 ${champ.name} gewinnt das Battle!`);
+      return;
+    }
+  }
+  renderBattleMatch();
+}
+
+// ── SCHOOLS ──
+function renderSchools() {
+  const sorted = [...schools].sort((a,b)=>b.votes-a.votes);
+  document.getElementById('schools-list').innerHTML = sorted.map((s,i) => {
+    const members = profiles.filter(p=>s.members.includes(p.id));
+    return `
+      <div class="school-card" style="border:1px solid ${i===0?'var(--gold)':'#1a1a1a'}">
+        <div class="school-header">
+          <div>
+            <div class="school-name-row">${rankBadge(i)}<div class="school-name">${s.name}</div></div>
+            <div class="school-desc">${s.desc}</div>
+          </div>
+          <div>
+            <div class="school-pts">${s.votes.toLocaleString()}</div>
+            <div class="school-pts-label">PUNKTE</div>
+            <div class="school-dvotes">${s.downvotes} downvotes</div>
+          </div>
+        </div>
+        <div class="gold-line"></div>
+        <div class="school-footer">
+          <div class="school-members">${members.map(m=>`<img src="${m.img}" title="${m.name}" class="school-member-img" alt="${m.name}" />`).join('')}<span style="color:var(--dim);font-size:13px;margin-left:4px">${members.length} Mitglieder</span></div>
+          <div style="margin-left:auto;display:flex;gap:7px;flex-wrap:wrap">
+            <button class="btn-gold btn-sm" onclick="voteSchool(${s.id},'up')">▲ VOTE</button>
+            <button class="btn-dark btn-sm btn-red" onclick="voteSchool(${s.id},'down')">▼ DOWN</button>
+            ${currentUser?`<button class="btn-dark btn-sm" onclick="joinSchool(${s.id})">JOINEN</button>`:''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ── COMMUNITY ──
+function renderCommunity() {
+  const compose = document.getElementById('community-compose');
+  if (currentUser) {
+    compose.innerHTML = `
+      <div class="compose-box">
+        <div class="compose-header">
+          <img src="${currentUser.img}" alt="${currentUser.name}" />
+          <span style="font-family:'Anton',sans-serif;font-size:15px">${currentUser.name}</span>
+        </div>
+        <textarea id="post-draft" rows="3" placeholder="Was hast du zu sagen, Chad?"></textarea>
+        <div style="text-align:right;margin-top:7px"><button class="btn-gold" onclick="submitPost()">POSTEN</button></div>
+      </div>
+    `;
+  } else {
+    compose.innerHTML = '';
+  }
+  document.getElementById('community-posts').innerHTML = communityPosts.map(post => {
+    const author = profiles.find(p=>p.id===post.authorId);
+    return `
+      <div class="post-card">
+        <div class="post-author">
+          ${author?`<img src="${author.img}" alt="${author.name}" />`:''}
+          <div>
+            <div class="post-author-name">${author?.name||'Unbekannt'}</div>
+            <div class="post-author-date">${post.date}</div>
+          </div>
+        </div>
+        <div class="post-content">${post.content}</div>
+        <div class="gold-line" style="margin:10px 0"></div>
+        ${post.comments.map(c=>`<div class="comment"><span class="comment-user">${c.user}:</span><span class="comment-text">&nbsp;${c.text}</span></div>`).join('')}
+        ${currentUser?`
+          <div style="display:flex;gap:7px;margin-top:10px">
+            <input id="comment-${post.id}" placeholder="Kommentieren..." style="flex:1;margin:0" />
+            <button class="btn-dark btn-sm" onclick="submitComment(${post.id})">SENDEN</button>
+          </div>
+        `:''}
+      </div>
+    `;
+  }).join('');
+}
+
+function submitPost() {
+  const content = document.getElementById('post-draft').value.trim();
+  if (!content || !currentUser) return;
+  communityPosts.unshift({ id:Date.now(), authorId:currentUser.id, content, likes:0, comments:[], date:new Date().toISOString().slice(0,10) });
+  notify('Post veröffentlicht!');
+  renderCommunity();
+}
+
+function submitComment(postId) {
+  const el = document.getElementById(`comment-${postId}`);
+  if (!el || !el.value.trim() || !currentUser) return;
+  const post = communityPosts.find(p=>p.id===postId);
+  if (post) { post.comments.push({user:currentUser.name, text:el.value.trim()}); }
+  renderCommunity();
+}
+
+// ── NEWS ──
+function renderNews() {
+  const compose = document.getElementById('news-compose');
+  if (isAdmin) {
+    compose.innerHTML = `
+      <div class="news-compose">
+        <div class="news-compose-title">NEWS POSTEN</div>
+        <input id="news-title-input" placeholder="Titel" />
+        <textarea id="news-content-input" rows="4" placeholder="Inhalt..."></textarea>
+        <div style="text-align:right;margin-top:7px"><button class="btn-gold" onclick="submitNews()">VERÖFFENTLICHEN</button></div>
+      </div>
+    `;
+  } else { compose.innerHTML = ''; }
+  document.getElementById('news-list').innerHTML = news.map(n => `
+    <div class="news-card">
+      <div class="news-meta">${n.date} · ${n.author.toUpperCase()}</div>
+      <div class="news-title">${n.title}</div>
+      <div class="gold-line"></div>
+      <div class="news-body">${n.content}</div>
+    </div>
+  `).join('');
+}
+
+function submitNews() {
+  const title = document.getElementById('news-title-input').value.trim();
+  const content = document.getElementById('news-content-input').value.trim();
+  if (!title || !content) return;
+  news.unshift({ id:Date.now(), title, content, date:new Date().toISOString().slice(0,10), author:'Admin' });
+  notify('News veröffentlicht!');
+  renderNews();
+}
+
+// ── ADMIN ──
+function renderAdmin() {
+  document.getElementById('admin-profiles-list').innerHTML = profiles.map(p => `
+    <div class="admin-row">
+      <img src="${p.img}" alt="${p.name}" />
+      <div class="admin-row-name">${p.name}</div>
+      <div class="admin-row-pts">${p.votes} pts</div>
+      <input type="number" class="admin-votes-input" value="${p.votes}" onchange="adminSetVotes(${p.id},this.value)" />
+      <button class="btn-dark btn-sm btn-red" onclick="adminDeleteProfile(${p.id})">LÖSCHEN</button>
+    </div>
+  `).join('');
+  document.getElementById('admin-schools-list').innerHTML = schools.map(s => `
+    <div class="admin-row">
+      <div class="admin-row-name">${s.name}</div>
+      <input type="number" class="admin-votes-input" value="${s.votes}" onchange="adminSetSchoolVotes(${s.id},this.value)" />
+    </div>
+  `).join('');
+}
+
+function adminSetVotes(id, val) {
+  const p = profiles.find(x=>x.id===id);
+  if (p) p.votes = parseInt(val)||0;
+}
+function adminSetSchoolVotes(id, val) {
+  const s = schools.find(x=>x.id===id);
+  if (s) s.votes = parseInt(val)||0;
+}
+function adminDeleteProfile(id) {
+  profiles = profiles.filter(x=>x.id!==id);
+  notify('Profil gelöscht!');
+  renderAdmin();
+}
+
+// ── INIT ──
+function init() {
+  // Populate school select in register modal
+  const sel = document.getElementById('reg-school');
+  schools.forEach(s => {
+    const o = document.createElement('option');
+    o.value = s.name; o.textContent = s.name;
+    sel.appendChild(o);
+  });
+  renderHome();
+  renderBattleStart();
+}
+
+init();
+</script>
+</body>
+</html>
